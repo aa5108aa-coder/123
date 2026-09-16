@@ -31,7 +31,7 @@
     .report-footer{font-size:8pt;color:#475569}.report-badge{display:inline-flex;align-items:center;justify-content:center;min-width:9mm;height:9mm;border:2px solid white;border-radius:50%;color:white;font:bold 11pt Arial;box-shadow:0 0 0 1px #334155;flex-shrink:0}
     .report-marker{background:none;border:0}.report-card{border:1px solid #94a3b8;border-radius:3mm;padding:4mm;margin:0 0 4mm;break-inside:avoid;page-break-inside:avoid}
     .report-card header{display:flex;align-items:center;gap:3mm;border-bottom:1px solid #cbd5e1;padding-bottom:2mm;margin-bottom:3mm}.report-card h3{margin:0;font-size:13pt}.report-card small{font-size:8pt;color:#475569}
-    .report-card-body{display:grid;grid-template-columns:38% 1fr;gap:4mm}.report-card-body.no-photo{grid-template-columns:1fr}.report-photos img{width:100%;height:48mm;object-fit:contain;display:block;margin-bottom:2mm}.report-photo-missing{font-size:9pt;color:#64748b}
+    .report-card-body{display:block}.report-photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4mm}.report-photos.single{grid-template-columns:1fr}.report-photos figure{margin:0;min-width:0;break-inside:avoid}.report-photos img{width:100%;height:55mm;object-fit:contain;display:block;background:#f8fafc}.report-photos figcaption{font-size:9pt;line-height:1.4;margin-top:2mm}.report-photo-missing{font-size:9pt;color:#64748b;min-height:55mm;display:flex;align-items:center;justify-content:center}
     .report-card p{font-size:10pt;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 2mm}.report-card h4{font-size:10pt;margin:0 0 1mm}.report-page h2{font-size:14pt;margin:0 0 4mm}
     @media print{
       @page{size:A4 portrait;margin:12mm}
@@ -281,7 +281,14 @@
     $('cancelReport').onclick=()=>$('reportModal').classList.remove('show');
     // 每一張卡先限制文字量，之後以實際 DOM 高度裝箱分頁，長筆記不截斷。
     function reportCardParts(note){const parts=[];const labels={observation:'現場觀察／空間現況',interview:'訪談紀錄／地方記憶',questions:'待查問題／附註'};for(const [key,label] of Object.entries(labels)){const text=note.sections[key]||((key==='questions')?'':'未填寫');for(let offset=0;offset<text.length;offset+=500)parts.push({label,text:text.slice(offset,offset+500)})}return parts.length?parts:[{label:labels.observation,text:'未填寫'}]}
-    function makeReportCard(note,parts,continuation){const article=document.createElement('article');article.className='report-card';const photos=continuation?[]:note.photos.slice(0,2);article.innerHTML=`<header><span class="report-badge" style="background:${note.color}">${note.number}</span><div><h3>${esc(note.title||'未命名筆記')}${continuation?'（續）':''}</h3><small>${esc(note.layer)} · ${esc(note.time)}</small></div></header><div class="report-card-body ${photos.length?'':'no-photo'}">${photos.length?`<div class="report-photos">${photos.map(url=>`<img src="${esc(url)}" alt="現場照片" loading="eager">`).join('')}</div>`:''}<div>${parts.map(p=>`<h4>【${esc(p.label)}】</h4><p>${esc(p.text)}</p>`).join('')}</div></div>`;return article}
+    function makeReportCard(note,parts,continuation){const article=document.createElement('article');article.className='report-card';article.innerHTML=`<header><span class="report-badge" style="background:${note.color}">${note.number}</span><div><h3>${esc(note.title||'未命名筆記')}${continuation?'（續）':''}</h3><small>${esc(note.layer)} · ${esc(note.time)}</small></div></header><div class="report-card-body">${parts.map(p=>`<h4>【${esc(p.label)}】</h4><p>${esc(p.text)}</p>`).join('')}</div>`;return article}
+    // 文字全寬、照片獨立成列：附圖不擠壓文字，也不截斷或限制總張數。
+    function makeReportPhotoCard(note,offset){
+      const card=makeReportCard(note,[],false),photos=note.photos.slice(offset,offset+2);
+      card.querySelector('h3').append('（附圖）');
+      card.querySelector('.report-card-body').innerHTML=`<div class="report-photos ${photos.length===1?'single':''}">${photos.map((url,index)=>`<figure><img src="${esc(url)}" alt="筆記 ${note.number} 附圖 ${offset+index+1}" loading="eager"><figcaption>圖 ${note.number}-${offset+index+1}</figcaption></figure>`).join('')}</div>`;
+      return card;
+    }
     // 圖磚／照片完成後才列印；失敗圖片改為說明，圖磚缺漏需使用者決定是否繼續。
     function waitReportImages(){return Promise.all([...reportRoot.querySelectorAll('img')].map(img=>new Promise(resolve=>{const finish=()=>{if(!img.naturalWidth&&!img.classList.contains('leaflet-tile')){const placeholder=document.createElement('p');placeholder.className='report-photo-missing';placeholder.textContent='照片無法載入（來源失效或限制存取）';img.replaceWith(placeholder)}resolve()};if(img.complete){finish();return}const timer=setTimeout(finish,12000);img.onload=img.onerror=()=>{clearTimeout(timer);finish()}})))}
     function disposeReportMap(){if(reportMap){const old=reportMap;reportMap=null;old.stop();old.remove()}}
@@ -324,6 +331,12 @@
               if(part.text.length>40){const middle=Math.ceil(part.text.length/2);card.remove();batches.splice(i,1,[...texts.slice(0,longest),{...part,text:part.text.slice(0,middle)}],[{...part,text:part.text.slice(middle)},...texts.slice(longest+1)]);i--;continue}
               throw Error('單張卡片超過紙張高度，請縮短標題或改用直向列印');
             }
+          }
+          // 每兩張附圖為一組，緊接所屬筆記；紙張不足時整組移至下一頁。
+          for(let offset=0;offset<note.photos.length;offset+=2){
+            if(!page)newPage();const photoCard=makeReportPhotoCard(note,offset);page.append(photoCard);
+            if(page.getBoundingClientRect().height>maxHeight&&page.children.length>2){photoCard.remove();newPage();page.append(photoCard)}
+            if(page.getBoundingClientRect().height>maxHeight)throw Error('附圖標題過長，請縮短點位名稱後重新列印');
           }
         }
         $('reportProgress').textContent='正在載入底圖與照片，請稍候…';const [loaded]=await Promise.all([tileReady,waitReportImages()]);

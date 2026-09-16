@@ -22,10 +22,12 @@
     <div class="content">
       <section class="section"><p class="section-title">基地範圍</p><label class="form-check"><input id="boundaryToggle" type="checkbox" checked /> 顯示基地範圍</label><div class="actions"><button class="btn" id="editBoundary">編輯折點</button><button class="btn" id="boundaryAdd">新增折點</button><button class="btn" id="resetBoundary">復原預設</button></div><p class="hint" id="boundaryHint">編輯後可拖曳折點；按「新增折點」再點選範圍邊線附近；右鍵折點可刪除。</p></section>
       <section class="section"><p class="section-title">協作身份</p><p class="hint" id="identityStatus">請選擇登入方式。</p><div class="actions"><button class="btn primary" id="googleSignIn">使用 Google 登入</button><button class="btn" id="guestSignIn">訪客登入</button></div></section>
-      <section class="section"><p class="section-title">目前踏查設定</p>
-        <label>踏查日期 / 梯次<select id="sessionSelect"></select></label>
-        <div class="form-grid"><label>新增日期<input id="newDate" type="date" /></label><label>梯次名稱<input id="newSessionName" placeholder="例如：第一梯次" /></label></div>
-        <button class="btn" id="addSession" style="width:100%;margin-top:9px">＋ 建立踏查圖層</button>
+      <section class="section"><p class="section-title">踏查圖層</p>
+        <p class="hint" style="margin-top:0">先建立踏查圖層，再從下方選擇要繪製與記錄的圖層。</p>
+        <div class="form-grid"><label>新圖層日期<input id="newDate" type="date" /></label><label>新圖層名稱<input id="newSessionName" placeholder="例如：第一梯次" /></label></div>
+        <button class="btn primary" id="addSession" style="width:100%;margin-top:9px">＋ 建立新踏查圖層</button>
+        <label style="margin-top:16px">目前使用圖層<select id="sessionSelect" aria-label="選擇目前使用的踏查圖層"></select></label>
+        <p class="hint">新路線與筆記會加入目前選取的圖層。</p>
       </section>
       <section class="section"><p class="section-title">路線繪製</p>
         <label>路線名稱<input id="routeName" placeholder="例如：仁和路步行踏查" /></label>

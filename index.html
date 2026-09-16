@@ -20,7 +20,7 @@
   <aside class="auth-panel" id="authPanel"><h1>南台南田野踏查</h1><p class="sub">請選擇登入方式以開始共同編輯。</p><p class="hint" id="identityStatus">請選擇登入方式。</p><div class="actions"><button class="btn primary" id="googleSignIn">使用 Google 登入</button><button class="btn" id="guestSignIn">訪客登入</button></div></aside>
   <button class="settings-launcher hidden" id="settingsButton">⚙ 設定</button>
   <aside class="panel hidden" id="panel">
-    <div class="panel-header editor-header"><div><h1 id="workspaceTitle">南台南田野踏查</h1><p class="sub" id="workspaceSubtitle">選擇資料夾後開始編輯</p></div><div style="display:flex;gap:6px"><button class="icon-btn" id="undoBtn" title="復原上一步" disabled>↶</button><button class="icon-btn" id="headerSettings" title="設定／資料夾">⚙</button></div></div>
+    <div class="panel-header editor-header"><div><h1 id="workspaceTitle" role="button" tabindex="0" title="點擊修改資料夾名稱">南台南田野踏查</h1><p class="sub" id="workspaceSubtitle">點擊標題修改資料夾名稱</p></div><div style="display:flex;gap:6px"><button class="icon-btn" id="undoBtn" title="復原上一步" disabled>↶</button><button class="icon-btn" id="headerSettings" title="設定／資料夾">⚙</button></div></div>
     <div class="content">
       <section class="section"><p class="section-title">框選範圍</p><input id="boundaryToggle" type="checkbox" hidden><label>已建立框選範圍<select id="areaSelect" aria-label="選擇框選範圍"></select></label><div id="areaList" class="layers"></div><div class="form-grid"><label>範圍名稱<input id="areaName" placeholder="例如：南台南基地" /></label><label>範圍顏色<input id="areaColor" type="color" value="#dc2626" /></label></div><button class="btn" id="newArea" type="button" style="width:100%;margin-top:9px">＋ 新增範圍</button><button class="btn" id="saveAreaName" style="width:100%;margin-top:9px">儲存範圍設定</button><div class="actions"><button class="btn" id="editBoundary">編輯折點</button><button class="btn" id="boundaryAdd">新增折點</button><button class="btn" id="resetBoundary">復原預設</button></div><p class="hint" id="boundaryHint">範圍只顯示外圍虛線；可切換顯示、選擇、編輯、改色或刪除。</p></section>
       <div id="groupWorkspace">
@@ -29,7 +29,7 @@
         <div class="form-grid"><label>新圖層日期<input id="newDate" type="date" /></label><label>新圖層名稱<input id="newSessionName" placeholder="例如：第一梯次" /></label></div>
         <button class="btn primary" id="addSession" style="width:100%;margin-top:9px">＋ 建立新踏查圖層</button>
         <label style="margin-top:16px">目前使用圖層<select id="sessionSelect" aria-label="選擇目前使用的踏查圖層"></select></label>
-        <p class="hint">新路線與筆記會加入目前選取的圖層。</p>
+        <p class="hint">新路線與筆記會加入目前選取的圖層。</p><div id="layerList" class="layers"></div>
       </section>
       <section class="section"><p class="section-title">路線繪製</p>
         <label>路線名稱<input id="routeName" placeholder="例如：仁和路步行踏查" /></label>
@@ -38,7 +38,6 @@
         <div class="actions"><button class="btn primary" id="drawRoute">✎ 開始畫路線</button><button class="btn" id="finishRoute" disabled>完成路線</button></div><p class="hint" id="routeHint">選擇日期後，點選地圖連續落點；雙擊或「完成路線」結束。</p>
       </section>
       <section class="section"><p class="section-title">踏查筆記</p><button class="btn primary" id="addPoi" style="width:100%">＋ 在地圖新增筆記標記</button><p class="hint">啟用後點選地圖，填寫觀察、訪談或空間現況。</p></section>
-      <section class="section"><p class="section-title">本群組圖層</p><div id="layerList" class="layers"></div></section>
       <section class="section"><p class="section-title">協作編輯紀錄</p><p class="hint" id="cloudStatus">正在連線協作資料庫…</p><div id="cloudRecordList" class="layers"></div></section>
       <section class="section"><p class="section-title">修改歷史</p><div id="historyList" class="layers"></div></section>
       <section class="section"><p class="section-title">尺度檢視</p><div class="scale-grid"><button class="btn" data-zoom-level="13">廣域</button><button class="btn" data-zoom-level="15">基地</button><button class="btn" data-zoom-level="17">街廓</button><button class="btn" data-zoom-level="18">細部</button><button class="btn" id="fitSite">目前範圍</button><button class="btn" id="fitAll">全部資料</button></div><p class="hint">右下角比例尺會隨縮放更新；可用滑鼠滾輪、觸控或左上角 + / − 自由檢視。</p></section>
@@ -161,6 +160,8 @@
     $('routeWeight').oninput=e=>$('weightValue').textContent=e.target.value;
     $('groupSelect').onchange=e=>{window.lastGroup=e.target.value;window.lastSession='';render();toast('已進入目前群組')};
     $('settingsButton').onclick=()=>$('settingsModal').classList.add('show');$('headerSettings').onclick=()=>$('settingsModal').classList.add('show');$('closeSettings').onclick=()=>$('settingsModal').classList.remove('show');
+    async function renameCurrentGroup(){const id=activeWorkspaceGroup||selectedGroupId(),group=data.groups.find(g=>g.id===id);if(!group)return;const name=prompt('資料夾名稱',group.name);if(name===null)return;const trimmed=name.trim();if(!trimmed){toast('資料夾名稱不可空白');return}const old=group.name;group.name=trimmed;try{await saveGroup(group);window.lastGroup=id;save();render();await recordHistory('重新命名資料夾',`${old} → ${trimmed}`);toast('資料夾名稱已更新並同步')}catch(error){group.name=old;console.error(error);toast('資料夾名稱更新失敗：請確認 Firestore Rules')}}
+    $('workspaceTitle').onclick=renameCurrentGroup;$('workspaceTitle').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();renameCurrentGroup()}};
     $('enterGroup').onclick=()=>{const id=selectedGroupId();if(!data.groups.some(g=>g.id===id)){toast('請先建立或選擇資料夾');return}activeWorkspaceGroup=id;window.lastGroup=id;$('panel').classList.remove('hidden','closed');$('settingsButton').classList.add('hidden');$('settingsModal').classList.remove('show');render();toast('已進入踏查資料夾')};
     $('signOut').onclick=async()=>{try{await firebase.auth().signOut();activeWorkspaceGroup='';$('panel').classList.add('hidden');$('settingsButton').classList.add('hidden');$('settingsModal').classList.remove('show');$('authPanel').classList.remove('hidden');setIdentity('請選擇登入方式。')}catch(error){console.error(error);toast('登出失敗')}};
     $('addGroup').onclick=async()=>{const name=$('newGroupName').value.trim();if(!name){toast('請輸入群組名稱');return}if(!cloudUser||!groupsRef){toast('請先登入協作身份');return}const g={id:uid(),name,visible:true};try{await saveGroup(g);data.groups.push(g);window.lastGroup=g.id;$('newGroupName').value='';save();render();await recordHistory('建立群組',g.name);toast('群組已建立，請在其中建立踏查圖層')}catch(error){console.error(error);toast('群組建立失敗：請確認 Firestore Rules')}};

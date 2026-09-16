@@ -24,6 +24,10 @@
     .report-meta h1{font-size:20pt;margin:0 0 3mm}.report-meta p{font-size:10pt;margin:1mm 0;white-space:pre-wrap}
     .report-map-wrap{position:relative;flex:1;min-height:60mm;border:1px solid #94a3b8}
     #report-map{position:absolute;inset:0}.report-north{position:absolute;right:5mm;top:5mm;z-index:800;background:white;padding:2mm;text-align:center;font-weight:bold;line-height:1.2}
+    /* 列印不得擷取到 Leaflet 淡入動畫的半透明圖磚。 */
+    #report-map .leaflet-tile-loaded{opacity:1!important}
+    #report-map .leaflet-tile-container,#report-map .leaflet-marker-icon{transition:none!important}
+    #report-map .report-badge{width:22px;min-width:22px;height:22px;font-size:9px;border-width:1.5px;box-shadow:0 0 0 .5px #334155}
     .report-footer{font-size:8pt;color:#475569}.report-badge{display:inline-flex;align-items:center;justify-content:center;min-width:9mm;height:9mm;border:2px solid white;border-radius:50%;color:white;font:bold 11pt Arial;box-shadow:0 0 0 1px #334155;flex-shrink:0}
     .report-marker{background:none;border:0}.report-card{border:1px solid #94a3b8;border-radius:3mm;padding:4mm;margin:0 0 4mm;break-inside:avoid;page-break-inside:avoid}
     .report-card header{display:flex;align-items:center;gap:3mm;border-bottom:1px solid #cbd5e1;padding-bottom:2mm;margin-bottom:3mm}.report-card h3{margin:0;font-size:13pt}.report-card small{font-size:8pt;color:#475569}
@@ -280,26 +284,29 @@
     function makeReportCard(note,parts,continuation){const article=document.createElement('article');article.className='report-card';const photos=continuation?[]:note.photos.slice(0,2);article.innerHTML=`<header><span class="report-badge" style="background:${note.color}">${note.number}</span><div><h3>${esc(note.title||'未命名筆記')}${continuation?'（續）':''}</h3><small>${esc(note.layer)} · ${esc(note.time)}</small></div></header><div class="report-card-body ${photos.length?'':'no-photo'}">${photos.length?`<div class="report-photos">${photos.map(url=>`<img src="${esc(url)}" alt="現場照片" loading="eager">`).join('')}</div>`:''}<div>${parts.map(p=>`<h4>【${esc(p.label)}】</h4><p>${esc(p.text)}</p>`).join('')}</div></div>`;return article}
     // 圖磚／照片完成後才列印；失敗圖片改為說明，圖磚缺漏需使用者決定是否繼續。
     function waitReportImages(){return Promise.all([...reportRoot.querySelectorAll('img')].map(img=>new Promise(resolve=>{const finish=()=>{if(!img.naturalWidth&&!img.classList.contains('leaflet-tile')){const placeholder=document.createElement('p');placeholder.className='report-photo-missing';placeholder.textContent='照片無法載入（來源失效或限制存取）';img.replaceWith(placeholder)}resolve()};if(img.complete){finish();return}const timer=setTimeout(finish,12000);img.onload=img.onerror=()=>{clearTimeout(timer);finish()}})))}
-    function cleanupReport(){document.body.classList.remove('report-printing','report-preparing');document.getElementById('fieldReportPageStyle')?.remove();if(reportMap){reportMap.remove();reportMap=null}reportRoot.replaceChildren();reportBusy=false;$('generateReport').disabled=false;map.invalidateSize()}
+    function disposeReportMap(){if(reportMap){const old=reportMap;reportMap=null;old.stop();old.remove()}}
+    function cleanupReport(){disposeReportMap();document.body.classList.remove('report-printing','report-preparing');document.getElementById('fieldReportPageStyle')?.remove();reportRoot.replaceChildren();reportBusy=false;$('generateReport').disabled=false;requestAnimationFrame(()=>map.invalidateSize({animate:false}))}
     window.addEventListener('afterprint',cleanupReport);
     async function generateFieldNotesReport(){
       if(reportBusy)return;reportBusy=true;$('generateReport').disabled=true;
       try{
         const snapshot=collectReportData(),landscape=$('reportOrientation').value==='landscape';
-        if(reportMap){reportMap.remove();reportMap=null}reportRoot.replaceChildren();
+        disposeReportMap();reportRoot.replaceChildren();
         reportRoot.className=landscape?'report-landscape':'';reportRoot.style.width=landscape?'273mm':'186mm';
         document.body.classList.add('report-preparing');
         const cover=document.createElement('section');cover.className='report-page report-cover';
         cover.innerHTML=`<header class="report-meta"><h1>${esc($('reportProject').value||'田野手札')}</h1><p>踏查日期：${esc($('reportDates').value||'未填寫')}　記錄團隊／成員：${esc($('reportTeam').value||'未填寫')}</p><p>天候：${esc($('reportWeather').value||'未填寫')}</p>${$('reportRemarks').value?`<p>備註：${esc($('reportRemarks').value)}</p>`:''}</header><div class="report-map-wrap"><div id="report-map"></div><div class="report-north" aria-label="北方">N<br>↑</div></div><footer class="report-footer">索引圖 · ${snapshot.notes.length} 筆筆記／${snapshot.routes.length} 條路線 · 底圖：Tiles © Esri / 內政部國土測繪中心</footer>`;
         reportRoot.append(cover);
-        reportMap=L.map('report-map',{zoomControl:false,attributionControl:true,preferCanvas:false,zoomSnap:0.25}).setView(map.getCenter(),map.getZoom());
+        // 停用動畫及互動，避免列印結束移除地圖後，殘留動畫讀取 _leaflet_pos。
+        // 整數縮放讓 256px 圖磚對齊像素，避免小數級縮放的插值模糊。
+        reportMap=L.map('report-map',{zoomControl:false,attributionControl:true,preferCanvas:false,zoomSnap:1,fadeAnimation:false,zoomAnimation:false,markerZoomAnimation:false,inertia:false,trackResize:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false,boxZoom:false,keyboard:false}).setView(map.getCenter(),Math.round(map.getZoom()),{animate:false});
         const currentBase=Object.values(base).find(layer=>map.hasLayer(layer))||Object.values(base)[0];
         const tiles=L.tileLayer(currentBase._url,{...currentBase.options});let tileFailures=0;tiles.on('tileerror',()=>tileFailures++);
         const bounds=L.latLngBounds(map.getBounds().getSouthWest(),map.getBounds().getNorthEast());
         snapshot.areas.forEach(area=>{L.polygon(area.points,{color:reportColor(area.color,'#dc2626'),weight:3,dashArray:'8 8',fill:false}).addTo(reportMap);area.points.forEach(p=>bounds.extend(p))});
         snapshot.routes.forEach(route=>{L.polyline(route.coordinates,{color:reportColor(route.color,'#e05a47'),weight:+route.weight||5}).addTo(reportMap);route.coordinates.forEach(p=>bounds.extend(p))});
-        snapshot.notes.forEach(note=>{bounds.extend(note.coordinates);L.marker(note.coordinates,{icon:L.divIcon({className:'report-marker',html:`<span class="report-badge" style="background:${note.color}">${note.number}</span>`,iconSize:[36,36],iconAnchor:[18,18]})}).addTo(reportMap)});
-        reportMap.invalidateSize();reportMap.fitBounds(bounds,{padding:[28,28],maxZoom:19});L.control.scale({position:'bottomleft',imperial:false,maxWidth:140}).addTo(reportMap);
+        snapshot.notes.forEach(note=>{bounds.extend(note.coordinates);L.marker(note.coordinates,{icon:L.divIcon({className:'report-marker',html:`<span class="report-badge" style="background:${note.color}">${note.number}</span>`,iconSize:[22,22],iconAnchor:[11,11]})}).addTo(reportMap)});
+        reportMap.invalidateSize({animate:false});reportMap.fitBounds(bounds,{padding:[28,28],maxZoom:19,animate:false});L.control.scale({position:'bottomleft',imperial:false,maxWidth:140}).addTo(reportMap);
         const tileReady=new Promise(resolve=>{const timer=setTimeout(()=>resolve(false),15000);tiles.once('load',()=>{clearTimeout(timer);resolve(true)})});tiles.addTo(reportMap);
         // 頁高稍留安全邊界；正常筆記直式約 2–3 張，長篇文字分續卡。
         const maxHeight=(landscape?184:271)*96/25.4;let page=null;
@@ -323,6 +330,8 @@
         if((!loaded||tileFailures)&&!confirm('部分底圖圖磚未能載入。仍要列印目前報表嗎？')){cleanupReport();return}
         const style=document.createElement('style');style.id='fieldReportPageStyle';style.textContent=`@page { size:A4 ${landscape?'landscape':'portrait'};margin:12mm;}`;document.head.append(style);
         $('reportModal').classList.remove('show');document.body.classList.add('report-printing');
+        // decode() 確保圖片不只下載完成，還完成解碼才交給列印引擎。
+        await Promise.all([...reportRoot.querySelectorAll('img')].map(img=>img.decode?img.decode().catch(()=>{}):Promise.resolve()));
         await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
         window.print();
       }catch(error){console.error(error);cleanupReport();toast('手札產生失敗：'+error.message)}

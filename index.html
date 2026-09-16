@@ -345,7 +345,10 @@
           const chunks=reportCardParts(note),batches=[];let batch=[],length=0;
           for(const chunk of chunks){if(batch.length&&(length+chunk.text.length>650||batch.length>=3)){batches.push(batch);batch=[];length=0}batch.push(chunk);length+=chunk.text.length}if(batch.length)batches.push(batch);
           for(let i=0;i<batches.length;i++){
-            if(!page)newPage();const card=makeReportCard(note,batches[i],i>0);page.append(card);
+            if(!page)newPage();const card=makeReportCard(note,batches[i],i>0);
+            // 首張卡共用一個標題及外框，先排全寬文字，再排照片。
+            if(i===0&&note.photos.length){const photos=makeReportPhotoCard(note,0).querySelector('.report-photos');photos.style.cssText='margin-top:4mm;padding-top:3mm;border-top:1px solid #e2e8f0';card.querySelector('.report-card-body').append(photos)}
+            page.append(card);
             if(page.getBoundingClientRect().height>maxHeight&&page.children.length>2){card.remove();newPage();page.append(card)}
             // 極長標題或密集換行仍可能超高：依實際高度遞迴拆文字，禁止靜默裁切。
             if(page.getBoundingClientRect().height>maxHeight){
@@ -354,8 +357,8 @@
               throw Error('單張卡片超過紙張高度，請縮短標題或改用直向列印');
             }
           }
-          // 每兩張附圖為一組，緊接所屬筆記；紙張不足時整組移至下一頁。
-          for(let offset=0;offset<note.photos.length;offset+=2){
+          // 前兩張照片已在文字卡內；更多照片以同編號續卡呈現。
+          for(let offset=2;offset<note.photos.length;offset+=2){
             if(!page)newPage();const photoCard=makeReportPhotoCard(note,offset);page.append(photoCard);
             if(page.getBoundingClientRect().height>maxHeight&&page.children.length>2){photoCard.remove();newPage();page.append(photoCard)}
             if(page.getBoundingClientRect().height>maxHeight)throw Error('附圖標題過長，請縮短點位名稱後重新列印');

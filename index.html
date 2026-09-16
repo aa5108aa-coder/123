@@ -13,6 +13,32 @@
     .panel.closed{transform:none;max-height:none;overflow:hidden}.panel.closed .content{padding:0 18px 18px}.panel.closed .content>.section:not(.identity-section),.panel.closed #groupWorkspace{display:none}.panel.closed #closePanel{font-size:0;width:auto;padding:0 10px}.panel.closed #closePanel::after{content:'展開';font-size:13px;font-weight:700}.panel-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 18px 10px}.panel h1{font-size:18px;margin:0 0 4px;letter-spacing:.02em}.sub{margin:0;color:var(--muted);font-size:12px}.icon-btn,.btn{border:0;border-radius:8px;cursor:pointer;font:inherit}.icon-btn{background:#e2e8f0;color:var(--ink);width:32px;height:32px;font-size:19px}.content{padding:0 18px 18px}.section{padding:14px 0;border-top:1px solid #e2e8f0}.section-title{font-size:12px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase;margin:0 0 10px}label{display:block;font-size:12px;font-weight:600;color:#475569;margin:8px 0 4px}input,textarea,select{width:100%;border:1px solid #cbd5e1;border-radius:7px;padding:8px;font:inherit;color:var(--ink);background:#fff}textarea{resize:vertical;min-height:70px}input[type="color"]{height:36px;padding:3px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.form-grid label{margin-top:0}.form-grid input{margin-top:4px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.btn{padding:9px 10px;background:#e2e8f0;color:#1e293b;font-size:13px;font-weight:700}.btn.primary{background:var(--accent);color:#fff}.btn.active{background:#d1fae5;color:#065f46;outline:2px solid #14b8a6}.btn.danger{background:#fee2e2;color:var(--danger)}.hint{margin:9px 0 0;font-size:12px;line-height:1.45;color:var(--muted)}.layers{max-height:180px;overflow:auto}.layer-row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:8px 1px;border-bottom:1px solid #edf2f7;font-size:13px}.layer-row:last-child{border:0}.layer-date{font-size:11px;color:var(--muted)}.mini{border:0;background:transparent;color:var(--accent);font-weight:700;cursor:pointer;font-size:12px}.status{position:fixed;z-index:1001;bottom:20px;left:20px;background:rgba(15,23,42,.88);color:white;border-radius:8px;padding:9px 12px;font-size:12px;display:none}.leaflet-popup-content{min-width:205px;max-width:280px;line-height:1.5}.poi-title{font-weight:800;font-size:16px;margin:0 0 5px}.poi-meta{font-size:11px;color:var(--muted);margin-bottom:8px}.poi-desc{white-space:pre-wrap;margin:0 0 9px}.popup-photo{width:100%;max-height:155px;object-fit:cover;border-radius:6px;cursor:zoom-in;margin:4px 0 9px}.popup-actions{display:flex;gap:8px}.popup-actions button{padding:5px 8px;font-size:12px}.modal{display:none;position:fixed;z-index:2000;inset:0;background:rgba(15,23,42,.46);align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.dialog{width:min(480px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.25)}.dialog h2{font-size:18px;margin:0 0 10px}.dialog .actions{grid-template-columns:1fr 1fr 1fr}.photo-preview{display:none;width:100%;max-height:140px;object-fit:cover;border-radius:7px;margin-top:8px}.route-tip{font-size:12px;color:#0f766e;font-weight:700;margin-top:8px}@media(max-width:620px){.panel{top:8px;left:8px;width:calc(100vw - 16px);max-height:calc(100vh - 16px)}.form-grid{grid-template-columns:1fr}.leaflet-control-layers{display:none}}
     .scale-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.scale-grid .btn{font-size:12px;padding:8px 4px}.print-sheet{display:none}.print-note{font-size:12px;color:var(--muted);line-height:1.5;margin:4px 0 0}.boundary-handle{background:transparent;border:0}.boundary-handle span{display:block;width:18px;height:18px;border:3px solid #fff;border-radius:50%;background:#dc2626;box-shadow:0 1px 5px rgba(0,0,0,.42);cursor:grab}.boundary-handle span:active{cursor:grabbing}@media print{@page{margin:10mm}.panel,.open-panel,.status,.leaflet-control-zoom,.leaflet-control-layers,.leaflet-control-scale,.boundary-handle{display:none!important}body{background:#fff}.print-sheet{display:flex!important;position:fixed;z-index:1500;top:0;left:0;right:0;align-items:flex-start;justify-content:space-between;gap:16px;padding:8mm 10mm;background:rgba(255,255,255,.94);border-bottom:1px solid #334155}.print-sheet h1{font-size:18px;margin:0 0 2px}.print-sheet p{font-size:11px;margin:0;color:#475569}.print-sheet .right{text-align:right}.leaflet-control-attribution{font-size:8px!important;background:rgba(255,255,255,.8)!important}#map{position:fixed;inset:0!important}}
     .layer-row{grid-template-columns:auto 1fr auto auto}.mini.danger{color:var(--danger)}.hidden{display:none!important}.auth-panel{position:fixed;z-index:1000;top:16px;left:16px;width:min(365px,calc(100vw - 32px));background:var(--paper);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.8);border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.2);padding:18px}.auth-panel h1{font-size:18px;margin:0 0 4px}.settings-launcher{position:fixed;z-index:1000;left:16px;top:16px;border:0;border-radius:10px;padding:10px 14px;background:var(--paper);box-shadow:0 4px 18px #64748b88;font:inherit;font-weight:700;cursor:pointer}.panel .editor-header{position:sticky;top:0;background:var(--paper);z-index:2}.accordion-section>.section-title{cursor:pointer;padding:2px 0}.accordion-section>.section-title::after{content:'⌄';float:right;color:var(--muted)}.accordion-section.collapsed>*:not(.section-title){display:none}.accordion-section.collapsed>.section-title::after{content:'›'}
+    /* 手札以實體 mm 排版；長文字由 JS 分成續頁卡，避免文字被裁切。 */
+    #print-report-container{display:none;background:white;color:#172b34}
+    body.report-preparing #print-report-container{display:block;position:absolute;left:-12000px;top:0;width:186mm}
+    .report-page{width:100%;break-before:page;page-break-before:always;padding:0}
+    .report-page:first-child{break-before:auto;page-break-before:auto}
+    .report-cover{height:272mm;display:flex;flex-direction:column;gap:4mm}
+    .report-landscape .report-cover{height:185mm}
+    .report-meta{border-bottom:2px solid #0f766e;padding-bottom:3mm;overflow-wrap:anywhere}
+    .report-meta h1{font-size:20pt;margin:0 0 3mm}.report-meta p{font-size:10pt;margin:1mm 0;white-space:pre-wrap}
+    .report-map-wrap{position:relative;flex:1;min-height:60mm;border:1px solid #94a3b8}
+    #report-map{position:absolute;inset:0}.report-north{position:absolute;right:5mm;top:5mm;z-index:800;background:white;padding:2mm;text-align:center;font-weight:bold;line-height:1.2}
+    .report-footer{font-size:8pt;color:#475569}.report-badge{display:inline-flex;align-items:center;justify-content:center;min-width:9mm;height:9mm;border:2px solid white;border-radius:50%;color:white;font:bold 11pt Arial;box-shadow:0 0 0 1px #334155;flex-shrink:0}
+    .report-marker{background:none;border:0}.report-card{border:1px solid #94a3b8;border-radius:3mm;padding:4mm;margin:0 0 4mm;break-inside:avoid;page-break-inside:avoid}
+    .report-card header{display:flex;align-items:center;gap:3mm;border-bottom:1px solid #cbd5e1;padding-bottom:2mm;margin-bottom:3mm}.report-card h3{margin:0;font-size:13pt}.report-card small{font-size:8pt;color:#475569}
+    .report-card-body{display:grid;grid-template-columns:38% 1fr;gap:4mm}.report-card-body.no-photo{grid-template-columns:1fr}.report-photos img{width:100%;height:48mm;object-fit:contain;display:block;margin-bottom:2mm}.report-photo-missing{font-size:9pt;color:#64748b}
+    .report-card p{font-size:10pt;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 2mm}.report-card h4{font-size:10pt;margin:0 0 1mm}.report-page h2{font-size:14pt;margin:0 0 4mm}
+    @media print{
+      @page{size:A4 portrait;margin:12mm}
+      body.report-printing{background:white!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      body.report-printing>*:not(#print-report-container){display:none!important}
+      body.report-printing #print-report-container{display:block!important;position:static!important;width:auto!important}
+      body.report-printing .leaflet-control-scale{display:block!important}
+      body.report-printing .leaflet-control-attribution{display:block!important}
+      .report-page{break-inside:avoid}.report-card img{break-inside:avoid}
+      aside,.modal,.auth-panel,.settings-launcher{display:none!important}
+    }
   </style>
 </head>
 <body>
@@ -46,6 +72,20 @@
     </div>
   </aside>
   <div id="status" class="status" aria-live="polite"></div>
+  <!-- 報表採獨立 Leaflet 地圖，列印不更動編輯地圖或雲端資料。 -->
+  <main id="print-report-container" aria-label="田野手札報告"></main>
+  <div class="modal" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="reportTitle"><form class="dialog" id="reportForm">
+    <h2 id="reportTitle">匯出田野手札（列印 PDF）</h2>
+    <label>資料夾／專案名稱<input id="reportProject" maxlength="100" required></label>
+    <label>踏查日期<input id="reportDates" maxlength="150"></label>
+    <label>記錄團隊／成員<input id="reportTeam" maxlength="150"></label>
+    <label>天候現況<input id="reportWeather" maxlength="100" placeholder="例如：晴，午後短暫陣雨"></label>
+    <label>備註<textarea id="reportRemarks" maxlength="300"></textarea></label>
+    <label>紙張方向<select id="reportOrientation"><option value="portrait">A4 直向</option><option value="landscape">A4 橫向</option></select></label>
+    <p class="hint">輸出目前資料夾中已顯示圖層的全部筆記、路線與範圍。索引圖會涵蓋目前視窗與這些圖徵。舊筆記全文歸入現場觀察；可用【訪談紀錄／地方記憶】與【待查問題／附註】分段。列印請選 A4、100% 比例、關閉瀏覽器頁首頁尾，並啟用背景圖形。</p>
+    <p id="reportProgress" class="hint" role="status"></p>
+    <div class="actions"><button class="btn" type="button" id="cancelReport">取消</button><button class="btn primary" id="generateReport" type="submit">產生並列印</button></div>
+  </form></div>
   <header class="print-sheet"><div><h1 id="printTitleOut">南台南田野踏查圖</h1><p id="printSubtitleOut"></p></div><div class="right"><p id="printDateOut"></p><p>底圖：Tiles © Esri / 內政部國土測繪中心</p></div></header>
   <div class="modal" id="poiModal" role="dialog" aria-modal="true" aria-labelledby="poiDialogTitle"><div class="dialog"><h2 id="poiDialogTitle">新增踏查筆記</h2><label>地點名稱 / 標題<input id="poiTitle" placeholder="例如：舊廠房入口" /></label><label>文字敘述<textarea id="poiDescription" placeholder="記錄踏查觀察、空間現況或訪談筆記…"></textarea></label><label>圖片 URL（選填）<input id="poiImageUrl" type="url" placeholder="https://…" /></label><label>或上傳照片（會以 Base64 儲存）<input id="poiImageFile" type="file" accept="image/*" /></label><img id="photoPreview" class="photo-preview" alt="照片預覽" /><div class="actions"><button class="btn danger" id="deletePoi" style="display:none">刪除</button><button class="btn" id="cancelPoi">取消</button><button class="btn primary" id="savePoi">儲存筆記</button></div></div></div>
   <div class="modal" id="printModal" role="dialog" aria-modal="true" aria-labelledby="printDialogTitle"><div class="dialog"><h2 id="printDialogTitle">繪製最終圖面</h2><label>圖面標題<input id="printTitle" value="南台南田野踏查圖" /></label><label>圖面副標題／圖例說明<input id="printSubtitle" placeholder="例如：2026 春季第一梯次踏查成果" /></label><label>紙張方向<select id="printOrientation"><option value="landscape">橫式（建議地圖使用）</option><option value="portrait">直式</option></select></label><p class="print-note">列印視窗中請勾選「背景圖形」，即可保留底圖與路線顏色；目標可選「另存為 PDF」。</p><div class="actions"><button class="btn" id="cancelPrint">取消</button><button class="btn primary" id="printNow">開啟列印視窗</button></div></div></div>
@@ -208,6 +248,88 @@
     $('printNow').onclick=()=>{const title=$('printTitle').value.trim()||'南台南田野踏查圖',subtitle=$('printSubtitle').value.trim(),s=currentSession();$('printTitleOut').textContent=title;$('printSubtitleOut').textContent=subtitle||sessionLabel(s);$('printDateOut').textContent=`出圖日期：${new Date().toLocaleDateString('zh-TW')}　目前縮放：${map.getZoom()}`;let style=document.getElementById('printPageStyle');if(!style){style=document.createElement('style');style.id='printPageStyle';document.head.appendChild(style)}style.textContent=`@media print{@page{size:A4 ${$('printOrientation').value};}}`;$('printModal').classList.remove('show');map.invalidateSize();setTimeout(()=>window.print(),250)};
     $('cloudRecordList').onclick=e=>{const id=e.target.closest('[data-cloud-focus]')?.dataset.cloudFocus;if(!id)return;const r=data.routes.find(x=>x.id===id),p=data.pois.find(x=>x.id===id);if(r)map.fitBounds(r.coordinates,{padding:[35,35],maxZoom:17});if(p){map.setView(p.coordinates,18);const group=overlays.get(p.sessionId);group?.eachLayer(layer=>{if(layer.getLatLng&&layer.getLatLng().lat===p.coordinates[0]&&layer.getLatLng().lng===p.coordinates[1])layer.openPopup()})}};
     function setupAccordions(){document.querySelectorAll('#panel .section').forEach(section=>{section.classList.add('accordion-section','collapsed');const title=section.querySelector('.section-title');if(!title)return;title.setAttribute('role','button');title.setAttribute('tabindex','0');const toggle=()=>section.classList.toggle('collapsed');title.onclick=toggle;title.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle()}}})}
+    // ===== 田野手札：資料映射、分頁、獨立索引地圖 =====
+    // 報表只讀目前工作資料夾，所有數據先複製，避免同步更新改變編號。
+    let reportMap=null,reportBusy=false;
+    const reportRoot=$('print-report-container');
+    const reportButton=document.createElement('button');
+    reportButton.className='btn primary';reportButton.id='openFieldReport';
+    reportButton.textContent='匯出田野手札（列印 PDF）';
+    reportButton.style.cssText='width:100%;margin-top:9px';
+    $('openPrint').after(reportButton);
+    function reportColor(value,fallback='#0f766e'){return /^#[0-9a-f]{6}$/i.test(value||'')?value:fallback}
+    function reportPhotoUrl(value){if(typeof value!=='string')return '';if(/^data:image\/(png|jpeg|webp|gif);base64,/i.test(value))return value;try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:''}catch{return ''}}
+    // 支援新結構化欄位；既有 description 可用相同中文標題分段。
+    function reportSections(note){const result={observation:note.observation||'',interview:note.interview||'',questions:note.questions||''};let field='observation';for(const line of (note.description||'').split('\n')){if(/^【現場觀察(?:／空間現況)?】/.test(line))field='observation';else if(/^【訪談紀錄(?:／地方記憶)?】/.test(line))field='interview';else if(/^【待查問題(?:／附註)?】/.test(line))field='questions';const text=line.replace(/^【(?:現場觀察(?:／空間現況)?|訪談紀錄(?:／地方記憶)?|待查問題(?:／附註)?)】\s*/,'');if(!note[field])result[field]+=(result[field]?'\n':'')+text}return result}
+    function collectReportData(){
+      const groupId=activeWorkspaceGroup;if(!groupId)throw Error('請先進入一個資料夾');
+      const sessions=data.sessions.filter(s=>s.groupId===groupId&&s.visible!==false&&overlays.has(s.id)&&map.hasLayer(overlays.get(s.id)));
+      const ids=new Set(sessions.map(s=>s.id)),routes=data.routes.filter(r=>ids.has(r.sessionId));
+      const notes=data.pois.filter(p=>ids.has(p.sessionId)).map((p,index)=>{
+        const session=sessions.find(s=>s.id===p.sessionId),meta=cloudMeta.get(p.id),palette=['#0f766e','#c2410c','#1d4ed8','#7e22ce','#be185d'];
+        const color=reportColor(session.color,reportColor(routes.find(r=>r.sessionId===session.id)?.color,palette[sessions.indexOf(session)%palette.length]));
+        const timestamp=p.createdAtMs||meta?.createdAtMs;
+        return {...p,number:String(index+1).padStart(2,'0'),color,layer:sessionLabel(session),time:timestamp?new Date(timestamp).toLocaleString('zh-TW'):(session.date?session.date+'（圖層日期；未記錄時間）':'未記錄時間'),sections:reportSections(p),photos:[...new Set([...(Array.isArray(p.images)?p.images:[]),p.image].map(reportPhotoUrl).filter(Boolean))]};
+      });
+      return JSON.parse(JSON.stringify({sessions,routes,notes,areas:areaState.areas.filter(a=>a.visible!==false)}));
+    }
+    reportButton.onclick=()=>{try{const snapshot=collectReportData();$('reportProject').value=data.groups.find(g=>g.id===activeWorkspaceGroup)?.name||'田野踏查';$('reportDates').value=[...new Set(snapshot.sessions.map(s=>s.date).filter(Boolean))].join('、');$('reportTeam').value=authorName||'';$('reportProgress').textContent=`${snapshot.notes.length} 筆筆記、${snapshot.routes.length} 條路線。`;$('reportModal').classList.add('show')}catch(error){toast(error.message)}};
+    $('cancelReport').onclick=()=>$('reportModal').classList.remove('show');
+    // 每一張卡先限制文字量，之後以實際 DOM 高度裝箱分頁，長筆記不截斷。
+    function reportCardParts(note){const parts=[];const labels={observation:'現場觀察／空間現況',interview:'訪談紀錄／地方記憶',questions:'待查問題／附註'};for(const [key,label] of Object.entries(labels)){const text=note.sections[key]||((key==='questions')?'':'未填寫');for(let offset=0;offset<text.length;offset+=500)parts.push({label,text:text.slice(offset,offset+500)})}return parts.length?parts:[{label:labels.observation,text:'未填寫'}]}
+    function makeReportCard(note,parts,continuation){const article=document.createElement('article');article.className='report-card';const photos=continuation?[]:note.photos.slice(0,2);article.innerHTML=`<header><span class="report-badge" style="background:${note.color}">${note.number}</span><div><h3>${esc(note.title||'未命名筆記')}${continuation?'（續）':''}</h3><small>${esc(note.layer)} · ${esc(note.time)}</small></div></header><div class="report-card-body ${photos.length?'':'no-photo'}">${photos.length?`<div class="report-photos">${photos.map(url=>`<img src="${esc(url)}" alt="現場照片" loading="eager">`).join('')}</div>`:''}<div>${parts.map(p=>`<h4>【${esc(p.label)}】</h4><p>${esc(p.text)}</p>`).join('')}</div></div>`;return article}
+    // 圖磚／照片完成後才列印；失敗圖片改為說明，圖磚缺漏需使用者決定是否繼續。
+    function waitReportImages(){return Promise.all([...reportRoot.querySelectorAll('img')].map(img=>new Promise(resolve=>{const finish=()=>{if(!img.naturalWidth&&!img.classList.contains('leaflet-tile')){const placeholder=document.createElement('p');placeholder.className='report-photo-missing';placeholder.textContent='照片無法載入（來源失效或限制存取）';img.replaceWith(placeholder)}resolve()};if(img.complete){finish();return}const timer=setTimeout(finish,12000);img.onload=img.onerror=()=>{clearTimeout(timer);finish()}})))}
+    function cleanupReport(){document.body.classList.remove('report-printing','report-preparing');document.getElementById('fieldReportPageStyle')?.remove();if(reportMap){reportMap.remove();reportMap=null}reportRoot.replaceChildren();reportBusy=false;$('generateReport').disabled=false;map.invalidateSize()}
+    window.addEventListener('afterprint',cleanupReport);
+    async function generateFieldNotesReport(){
+      if(reportBusy)return;reportBusy=true;$('generateReport').disabled=true;
+      try{
+        const snapshot=collectReportData(),landscape=$('reportOrientation').value==='landscape';
+        if(reportMap){reportMap.remove();reportMap=null}reportRoot.replaceChildren();
+        reportRoot.className=landscape?'report-landscape':'';reportRoot.style.width=landscape?'273mm':'186mm';
+        document.body.classList.add('report-preparing');
+        const cover=document.createElement('section');cover.className='report-page report-cover';
+        cover.innerHTML=`<header class="report-meta"><h1>${esc($('reportProject').value||'田野手札')}</h1><p>踏查日期：${esc($('reportDates').value||'未填寫')}　記錄團隊／成員：${esc($('reportTeam').value||'未填寫')}</p><p>天候：${esc($('reportWeather').value||'未填寫')}</p>${$('reportRemarks').value?`<p>備註：${esc($('reportRemarks').value)}</p>`:''}</header><div class="report-map-wrap"><div id="report-map"></div><div class="report-north" aria-label="北方">N<br>↑</div></div><footer class="report-footer">索引圖 · ${snapshot.notes.length} 筆筆記／${snapshot.routes.length} 條路線 · 底圖：Tiles © Esri / 內政部國土測繪中心</footer>`;
+        reportRoot.append(cover);
+        reportMap=L.map('report-map',{zoomControl:false,attributionControl:true,preferCanvas:false,zoomSnap:0.25}).setView(map.getCenter(),map.getZoom());
+        const currentBase=Object.values(base).find(layer=>map.hasLayer(layer))||Object.values(base)[0];
+        const tiles=L.tileLayer(currentBase._url,{...currentBase.options});let tileFailures=0;tiles.on('tileerror',()=>tileFailures++);
+        const bounds=L.latLngBounds(map.getBounds().getSouthWest(),map.getBounds().getNorthEast());
+        snapshot.areas.forEach(area=>{L.polygon(area.points,{color:reportColor(area.color,'#dc2626'),weight:3,dashArray:'8 8',fill:false}).addTo(reportMap);area.points.forEach(p=>bounds.extend(p))});
+        snapshot.routes.forEach(route=>{L.polyline(route.coordinates,{color:reportColor(route.color,'#e05a47'),weight:+route.weight||5}).addTo(reportMap);route.coordinates.forEach(p=>bounds.extend(p))});
+        snapshot.notes.forEach(note=>{bounds.extend(note.coordinates);L.marker(note.coordinates,{icon:L.divIcon({className:'report-marker',html:`<span class="report-badge" style="background:${note.color}">${note.number}</span>`,iconSize:[36,36],iconAnchor:[18,18]})}).addTo(reportMap)});
+        reportMap.invalidateSize();reportMap.fitBounds(bounds,{padding:[28,28],maxZoom:19});L.control.scale({position:'bottomleft',imperial:false,maxWidth:140}).addTo(reportMap);
+        const tileReady=new Promise(resolve=>{const timer=setTimeout(()=>resolve(false),15000);tiles.once('load',()=>{clearTimeout(timer);resolve(true)})});tiles.addTo(reportMap);
+        // 頁高稍留安全邊界；正常筆記直式約 2–3 張，長篇文字分續卡。
+        const maxHeight=(landscape?184:271)*96/25.4;let page=null;
+        const newPage=()=>{page=document.createElement('section');page.className='report-page';page.innerHTML=`<h2>田野筆記 · ${esc($('reportProject').value)}</h2>`;reportRoot.append(page)};
+        if(!snapshot.notes.length){newPage();const empty=document.createElement('p');empty.textContent='目前顯示圖層沒有踏查筆記。';page.append(empty)}
+        for(const note of snapshot.notes){
+          const chunks=reportCardParts(note),batches=[];let batch=[],length=0;
+          for(const chunk of chunks){if(batch.length&&(length+chunk.text.length>650||batch.length>=3)){batches.push(batch);batch=[];length=0}batch.push(chunk);length+=chunk.text.length}if(batch.length)batches.push(batch);
+          for(let i=0;i<batches.length;i++){
+            if(!page)newPage();const card=makeReportCard(note,batches[i],i>0);page.append(card);
+            if(page.getBoundingClientRect().height>maxHeight&&page.children.length>2){card.remove();newPage();page.append(card)}
+            // 極長標題或密集換行仍可能超高：依實際高度遞迴拆文字，禁止靜默裁切。
+            if(page.getBoundingClientRect().height>maxHeight){
+              const texts=batches[i],longest=texts.reduce((best,p,index)=>p.text.length>texts[best].text.length?index:best,0),part=texts[longest];
+              if(part.text.length>40){const middle=Math.ceil(part.text.length/2);card.remove();batches.splice(i,1,[...texts.slice(0,longest),{...part,text:part.text.slice(0,middle)}],[{...part,text:part.text.slice(middle)},...texts.slice(longest+1)]);i--;continue}
+              throw Error('單張卡片超過紙張高度，請縮短標題或改用直向列印');
+            }
+          }
+        }
+        $('reportProgress').textContent='正在載入底圖與照片，請稍候…';const [loaded]=await Promise.all([tileReady,waitReportImages()]);
+        if((!loaded||tileFailures)&&!confirm('部分底圖圖磚未能載入。仍要列印目前報表嗎？')){cleanupReport();return}
+        const style=document.createElement('style');style.id='fieldReportPageStyle';style.textContent=`@page { size:A4 ${landscape?'landscape':'portrait'};margin:12mm;}`;document.head.append(style);
+        $('reportModal').classList.remove('show');document.body.classList.add('report-printing');
+        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+        window.print();
+      }catch(error){console.error(error);cleanupReport();toast('手札產生失敗：'+error.message)}
+    }
+    // 供外部按鈕／Console 呼叫；表單仍是一般使用者的入口。
+    window.generateFieldNotesReport=generateFieldNotesReport;
+    $('reportForm').onsubmit=event=>{event.preventDefault();generateFieldNotesReport()};
     setupAccordions();render();renderCloudList();renderHistory();initCloud();
   })();
   </script>

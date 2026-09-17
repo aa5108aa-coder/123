@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>南台南田野踏查互動地圖工具</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
@@ -44,7 +44,6 @@
       aside,.modal,.auth-panel,.settings-launcher{display:none!important}
     }
   </style>
-<link rel="stylesheet" href="modern.css">
 </head>
 <body>
   <div id="map" aria-label="南台南田野踏查地圖"></div>
@@ -99,11 +98,6 @@
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
-<script>window.__fieldRawBeforeInit={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('southTainanFieldSurvey.'))window.__fieldRawBeforeInit[k]=localStorage.getItem(k)}}catch(error){console.warn('無法讀取本機備份',error)}</script>
-<script src="mobile-map.js"></script>
-<script src="word-export.js"></script>
-<script async src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
-<script async src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script>
   (() => {
     const KEY='southTainanFieldSurvey.v1',DEFAULT_GROUP='default-group'; const $=id=>document.getElementById(id);
@@ -214,8 +208,8 @@
     async function finishRoute(){if(draft.length<2){toast('路線至少需要兩個點位');return}const s=currentSession(),route={id:uid(),sessionId:s.id,name:$('routeName').value.trim()||'未命名路線',description:$('routeDescription').value.trim(),color:$('routeColor').value,weight:+$('routeWeight').value,coordinates:draft};data.routes.push(route);await syncCloud('route',route);save();if(draftLine)map.removeLayer(draftLine);draft=[];draftLine=null;setMode(null);await recordHistory('新增路線',route.name,null,route);pushUndo('新增路線「'+route.name+'」',async()=>{data.routes=data.routes.filter(x=>x.id!==route.id);await deleteCloud(route.id)});toast('路線已儲存並同步');}
     function openPoi(latlng,p=null){pendingLatLng=latlng;editingId=p?.id||null;uploadedImage=p?.image||null;$('poiDialogTitle').textContent=p?'編輯踏查筆記':'新增踏查筆記';$('poiTitle').value=p?.title||'';$('poiDescription').value=p?.description||'';$('poiImageUrl').value=p?.image?.startsWith('data:')?'':(p?.image||'');$('poiImageFile').value='';$('deletePoi').style.display=p?'block':'none';preview(uploadedImage);$('poiModal').classList.add('show');}
     function preview(src){const el=$('photoPreview');if(src){el.src=src;el.style.display='block'}else{el.removeAttribute('src');el.style.display='none'}}
-    map.on('click',e=>{if(matchMedia('(max-width:767px)').matches&&['route','poi'].includes(mode)&&!boundaryAddMode)return;if(boundaryAddMode){insertBoundaryPoint(e.latlng);return}if(mode==='route'){draft.push([e.latlng.lat,e.latlng.lng]);if(draftLine)map.removeLayer(draftLine);draftLine=L.polyline(draft,{color:$('routeColor').value,weight:+$('routeWeight').value,dashArray:'5 7'}).addTo(map);$('finishRoute').disabled=draft.length<2;render()}else if(mode==='poi'){setMode(null);const popup=L.popup({maxWidth:320,closeOnClick:false}).setLatLng(e.latlng).setContent(poiFormHtml());popup.once('add',()=>bindPoiPopupForm(e.latlng,popup));popup.openOn(map)}});
-    map.on('dblclick',e=>{if(!matchMedia('(max-width:767px)').matches&&mode==='route'){e.originalEvent.preventDefault();finishRoute()}});
+    map.on('click',e=>{if(boundaryAddMode){insertBoundaryPoint(e.latlng);return}if(mode==='route'){draft.push([e.latlng.lat,e.latlng.lng]);if(draftLine)map.removeLayer(draftLine);draftLine=L.polyline(draft,{color:$('routeColor').value,weight:+$('routeWeight').value,dashArray:'5 7'}).addTo(map);$('finishRoute').disabled=draft.length<2;render()}else if(mode==='poi'){setMode(null);const popup=L.popup({maxWidth:320,closeOnClick:false}).setLatLng(e.latlng).setContent(poiFormHtml());popup.once('add',()=>bindPoiPopupForm(e.latlng,popup));popup.openOn(map)}});
+    map.on('dblclick',e=>{if(mode==='route'){e.originalEvent.preventDefault();finishRoute()}});
     $('drawRoute').onclick=()=>{if(mode==='route'){if(draftLine)map.removeLayer(draftLine);draft=[];draftLine=null;setMode(null)}else{draft=[];setMode('route')}};$('finishRoute').onclick=finishRoute;$('addPoi').onclick=()=>setMode(mode==='poi'?null:'poi');
     $('routeWeight').oninput=e=>$('weightValue').textContent=e.target.value;
     $('groupSelect').onchange=e=>{window.lastGroup=e.target.value;window.lastSession='';if(!activeWorkspaceGroup)render();toast('已選擇資料夾，按「進入此資料夾」開始操作')};
@@ -383,84 +377,7 @@
     // 供外部按鈕／Console 呼叫；表單仍是一般使用者的入口。
     window.generateFieldNotesReport=generateFieldNotesReport;
     $('reportForm').onsubmit=event=>{event.preventDefault();generateFieldNotesReport()};
-    // UI integration only. Original IDs, storage keys and persistence functions remain intact.
-    const modernMobile=matchMedia('(max-width:767px)');
-    const panel=$('panel'), content=panel.querySelector('.content');
-    const make=(tag,attrs={},text='')=>{const el=document.createElement(tag);Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));el.textContent=text;return el};
-    const button=(text,fn)=>{const el=make('button',{class:'btn',type:'button'},text);el.onclick=fn;return el};
-    const top=make('header',{id:'modernTop',class:'hidden'}),brand=make('strong',{},'南台南田野踏查'),nav=make('nav',{'aria-label':'專案功能'});
-    top.append(brand,nav);document.body.append(top);
-    function drawer(title){const d=make('dialog',{class:'modern-drawer','aria-label':title}),head=make('div',{class:'modern-dialog-head'});head.append(make('h2',{},title),button('關閉',()=>d.close()));d.append(head);document.body.append(d);return d}
-    const historyDrawer=drawer('歷史紀錄'),projectDrawer=drawer('專案設定'),exportDrawer=drawer('匯出');
-    nav.append(button('歷史',()=>historyDrawer.showModal()),button('設定',()=>projectDrawer.showModal()),button('匯出',()=>exportDrawer.showModal()));
-    const sections=[...panel.querySelectorAll('.section')];
-    function sectionFor(id){return $(id).closest('.section')}
-    [sectionFor('cloudStatus'),sectionFor('historyList')].forEach(el=>historyDrawer.append(el));
-    [sectionFor('fitSite'),sectionFor('importInput')].forEach(el=>projectDrawer.append(el));
-    const rename=button('重新命名目前資料夾',renameCurrentGroup),folders=button('切換／管理資料夾',()=>{projectDrawer.close();$('settingsModal').classList.add('show')});
-    projectDrawer.prepend(rename,folders);
-    const legacyLink=make('a',{href:'legacy.html'},'切回舊版介面（使用同一份資料）');projectDrawer.append(legacyLink);
-    historyDrawer.append($('undoBtn'));$('undoBtn').textContent='↶ 復原上一筆修改';$('undoBtn').style.width='auto';
-    exportDrawer.append(sectionFor('openPrint'));
-    exportDrawer.append($('exportBtn'));
-    // Actual existing controls are moved, never cloned; their listeners stay attached.
-    [$('openPrint'),$('openFieldReport'),$('exportBtn')].forEach(el=>el.addEventListener('click',()=>exportDrawer.close()));
-    const layerSection=sectionFor('sessionSelect'),areaSection=sectionFor('areaSelect'),routeSection=sectionFor('drawRoute'),noteSection=sectionFor('addPoi');
-    const layerLabel=$('sessionSelect').closest('label');layerLabel.classList.add('modern-layer-select');
-    content.prepend(layerLabel);
-    const quick=make('div',{class:'modern-quick'});quick.append($('drawRoute'),$('addPoi'),button('範圍',()=>{setSnap('full');areaSection.scrollIntoView({block:'nearest'})}));layerLabel.after(quick);
-    $('drawRoute').textContent='繪製路線';$('addPoi').textContent='新增筆記';
-    const options=make('details',{class:'modern-options'});options.append(make('summary',{},'圖層、範圍與路線設定'));[layerSection,areaSection,routeSection].forEach(el=>options.append(el));quick.after(options);noteSection.remove();
-    sections.forEach(el=>{el.classList.remove('accordion-section','collapsed');const t=el.querySelector('.section-title');if(t){t.onclick=null;t.onkeydown=null;t.removeAttribute('role');t.removeAttribute('tabindex')}});
-    const handle=button('目前圖層 · 收合',()=>setSnap(['collapsed','half','full'][(['collapsed','half','full'].indexOf(snap)+1)%3]));handle.id='modernHandle';handle.setAttribute('aria-controls','modernBody');content.id='modernBody';panel.prepend(handle);
-    let snap='collapsed';
-    function sizes(){const h=window.visualViewport?.height||innerHeight,safe=parseFloat(getComputedStyle(panel).paddingBottom)||0;return [68+safe,Math.min(h-76,320+safe),Math.max(68+safe,h-76)]}
-    function setSnap(next){snap=next;panel.dataset.snap=snap;options.open=modernMobile.matches?snap==='full':options.open;content.inert=modernMobile.matches&&snap==='collapsed';handle.setAttribute('aria-expanded',String(snap!=='collapsed'));panel.style.setProperty('--sheet-height',sizes()[['collapsed','half','full'].indexOf(snap)]+'px');refreshModern()}
-    let gesture=null,ignoreClick=0;
-    handle.addEventListener('click',e=>{if(e.detail&&performance.now()<ignoreClick){e.stopImmediatePropagation();e.preventDefault()}},true);
-    handle.addEventListener('pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;gesture={id:e.pointerId,y:e.clientY,height:panel.getBoundingClientRect().height};handle.setPointerCapture(e.pointerId);panel.classList.add('dragging')});
-    handle.addEventListener('pointermove',e=>{if(e.pointerId!==gesture?.id)return;const s=sizes();panel.style.setProperty('--sheet-height',Math.max(s[0],Math.min(s[2],gesture.height+gesture.y-e.clientY))+'px')});
-    function endGesture(e,cancel=false){if(e.pointerId!==gesture?.id)return;const g=gesture;gesture=null;panel.classList.remove('dragging');if(cancel||Math.abs(e.clientY-g.y)<8){setSnap(snap);return}ignoreClick=performance.now()+500;const height=panel.getBoundingClientRect().height,s=sizes();let i=s.reduce((best,h,i)=>Math.abs(h-height)<Math.abs(s[best]-height)?i:best,0);if(i===['collapsed','half','full'].indexOf(snap)&&Math.abs(e.clientY-g.y)>32)i=Math.max(0,Math.min(2,i+(e.clientY<g.y?1:-1)));setSnap(['collapsed','half','full'][i])}
-    handle.addEventListener('pointerup',e=>endGesture(e));handle.addEventListener('pointercancel',e=>endGesture(e,true));handle.addEventListener('lostpointercapture',e=>endGesture(e,true));
-    handle.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();setSnap(['collapsed','half','full'][Math.max(0,Math.min(2,['collapsed','half','full'].indexOf(snap)+(e.key==='ArrowUp'?1:-1)))])}});
-    const routeBar=make('section',{id:'modernRoute',class:'hidden','aria-label':'繪製操作'}),routeHint=make('p',{'role':'status'}),routeButtons=make('div',{class:'actions'});
-    const routeUndo=button('↶ 撤銷落點',()=>{tapGate.reset();draft.pop();if(draftLine)draftLine.setLatLngs(draft);$('finishRoute').disabled=draft.length<2;refreshModern()}),routeFinish=button('完成繪製',async()=>{tapGate.reset();routeFinish.disabled=true;try{await finishRoute()}finally{refreshModern()}}),routeCancel=button('取消',()=>{if(draftLine)map.removeLayer(draftLine);draft=[];draftLine=null;setMode(null);refreshModern()});routeFinish.classList.add('primary');routeButtons.append(routeCancel,routeUndo,routeFinish);routeBar.append(routeHint,routeButtons);document.body.append(routeBar);
-    function refreshModern(){const visible=!panel.classList.contains('hidden');top.classList.toggle('hidden',!visible);brand.textContent=$('workspaceTitle').textContent;handle.textContent=($('sessionSelect').selectedOptions[0]?.textContent||'尚無圖層')+' · '+({collapsed:'收合 ⌃',half:'半開 ⌃',full:'全展開 ⌄'})[snap];routeBar.classList.toggle('hidden',!visible||mode!=='route');routeUndo.disabled=!draft.length;routeFinish.disabled=draft.length<2;routeHint.textContent=`單擊地圖落點 · ${draft.length} 點 · 可拖曳／雙指縮放`}
-    new MutationObserver(refreshModern).observe($('sessionSelect'),{childList:true});new MutationObserver(refreshModern).observe(panel,{attributes:true,attributeFilter:['class']});
-    $('sessionSelect').addEventListener('change',refreshModern);
-    [$('drawRoute'),$('addPoi')].forEach(el=>el.addEventListener('click',()=>{setSnap('collapsed');refreshModern()}));
-    const originalRender=render;render=function(){originalRender();refreshModern()};
-    const tapGate=window.FieldMobileMap.installTapGate(map.getContainer(),{enabled:()=>modernMobile.matches&&!document.querySelector('.modal.show,dialog[open]')&&['route','poi'].includes(mode)&&!boundaryAddMode,onTap:e=>{
-      const p=map.mouseEventToLatLng(e);
-      if(mode==='route'){draft.push([p.lat,p.lng]);if(draftLine)draftLine.setLatLngs(draft);else draftLine=L.polyline(draft,{color:$('routeColor').value,weight:+$('routeWeight').value,dashArray:'5 7'}).addTo(map);$('finishRoute').disabled=draft.length<2;refreshModern()}
-      else if(mode==='poi'){setMode(null);openPoi(p)}
-    }});
-    // Original single-image schema and compression pipeline are retained.
-    const poiDialog=$('poiModal').querySelector('.dialog'),poiHeading=$('poiDialogTitle'),poiActions=poiDialog.querySelector('.actions'),poiFields=make('div',{class:'modern-poi-fields'}),poiFooter=make('div',{class:'modern-poi-footer'});
-    [...poiDialog.children].filter(el=>el!==poiHeading&&el!==poiActions).forEach(el=>poiFields.append(el));
-    const camera=make('input',{type:'file',accept:'image/*',capture:'environment',hidden:''}),cameraButton=button('拍照',()=>camera.click()),uploadButton=button('上傳照片',()=>$('poiImageFile').click()),photoActions=make('div',{class:'actions'});photoActions.append(cameraButton,uploadButton);poiFooter.append(photoActions,camera,poiActions);poiDialog.append(poiFields,poiFooter);
-    camera.onchange=e=>{const file=e.target.files[0];if(!file)return;const oldImage=uploadedImage;const oldUrl=$('poiImageUrl').value;$('savePoi').disabled=true;poiImageTask=preparePoiImage(file,'').then(image=>{uploadedImage=image;$('poiImageUrl').value='';$('poiImageFile').value='';preview(image)}).catch(error=>{uploadedImage=oldImage;$('poiImageUrl').value=oldUrl;toast(error.message)}).finally(()=>{$('savePoi').disabled=false;camera.value=''})};
-    // Avoid closing or replacing the photo while the original async save is running.
-    const originalSavePoi=$('savePoi').onclick;$('savePoi').onclick=async()=>{const controls=[cameraButton,uploadButton,$('cancelPoi'),$('deletePoi'),$('poiImageFile'),$('poiImageUrl')];controls.forEach(e=>e.disabled=true);try{await originalSavePoi()}finally{controls.forEach(e=>e.disabled=false)}};
-    let priorFocus;new MutationObserver(()=>{if($('poiModal').classList.contains('show')){priorFocus=document.activeElement;poiHeading.tabIndex=-1;poiHeading.focus()}else priorFocus?.focus?.()}).observe($('poiModal'),{attributes:true,attributeFilter:['class']});
-    $('poiModal').addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('savePoi').disabled){$('cancelPoi').onclick();return}if(e.key==='Tab'){const controls=[...poiDialog.querySelectorAll('button,input,textarea')].filter(el=>!el.disabled&&el.getClientRects().length);const first=controls[0],last=controls.at(-1);if(e.shiftKey&&(document.activeElement===first||document.activeElement===poiHeading)){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}});
-    function viewportModern(){document.documentElement.style.setProperty('--vv-height',(window.visualViewport?.height||innerHeight)+'px');document.documentElement.style.setProperty('--vv-top',(window.visualViewport?.offsetTop||0)+'px');if(!gesture)setSnap(snap)}
-    window.visualViewport?.addEventListener('resize',viewportModern);window.visualViewport?.addEventListener('scroll',viewportModern);window.addEventListener('resize',viewportModern);modernMobile.addEventListener('change',()=>{tapGate.reset();viewportModern();map.invalidateSize()});
-    function downloadJson(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})),a=make('a',{href:url,download:name});a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
-    exportDrawer.append(button('下載更新前／目前資料備份',()=>{
-      const storage={};for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key.startsWith('southTainanFieldSurvey.'))storage[key]=localStorage.getItem(key)}
-      downloadJson({format:'south-tainan-safety-snapshot-v1',exportedAt:new Date().toISOString(),note:'本機快取及目前已載入資料；非完整 Firestore 備份，不可當 GeoJSON 匯入',beforePageInit:window.__fieldRawBeforeInit,currentLocalStorage:storage,data:JSON.parse(JSON.stringify(data)),activeWorkspaceGroup,activeAreas:snapshotAreas(),loadedCloudMeta:[...cloudMeta],loadedHistory:[...cloudHistory]},`踏查安全備份_${new Date().toISOString().slice(0,10)}.json`)
-    }));
-    const word=button('匯出可編輯 Word (.docx)',async()=>{word.disabled=true;wordProgress.textContent='正在生成 Word 文件…';try{
-      const snapshot=collectReportData();
-      const report={name:data.groups.find(g=>g.id===activeWorkspaceGroup)?.name||'田野踏查',surveyDates:[...new Set(snapshot.sessions.map(s=>s.date).filter(Boolean))],layers:snapshot.sessions.map((s,order)=>({name:sessionLabel(s),order,notes:snapshot.notes.filter(p=>p.sessionId===s.id).map(p=>({title:p.title,createdAt:p.createdAtMs||cloudMeta.get(p.id)?.createdAtMs||null,latitude:p.coordinates[0],longitude:p.coordinates[1],content:Object.entries(p.sections).map(([k,v])=>`${({observation:'現場觀察',interview:'訪談紀錄',questions:'待查問題'})[k]}\n${v||'未填寫'}`).join('\n\n'),metadata:{圖層:sessionLabel(s),記錄者:cloudMeta.get(p.id)?.author||'未記錄',訪談對象:p.interviewee||'未記錄',現況分類:p.category||'未記錄'},photos:p.photos.map(source=>({source}))}))}))};
-      const result=await FieldWord.exportDocx(report,{onProgress:p=>wordProgress.textContent=`${p.percent}% ${p.message}`});wordProgress.textContent=result.warnings.length?'文件已生成；'+result.warnings.join('；'):'文件已生成，已觸發下載。';
-      if(wordLink.href.startsWith('blob:'))URL.revokeObjectURL(wordLink.href);wordLink.href=URL.createObjectURL(result.blob);wordLink.download=result.filename;wordLink.hidden=false;
-    }catch(error){wordProgress.textContent=error.message}finally{word.disabled=false}}),wordProgress=make('p',{role:'status'}),wordLink=make('a',{hidden:''},'若未開始下載，點此下載 Word');
-    exportDrawer.append(word,wordProgress,wordLink);viewportModern();
-
-
-    render();renderCloudList();renderHistory();initCloud();
+    setupAccordions();render();renderCloudList();renderHistory();initCloud();
   })();
   </script>
 </body>

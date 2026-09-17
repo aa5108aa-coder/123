@@ -165,5 +165,5 @@
       return { blob, filename, warnings, noteCount: count };
     } finally { exporting = false; }
   }
-  window.FieldWord = Object.freeze({ exportDocx, normalize });
+  window.FieldWord = Object.freeze({ exportDocx, normalize, prepareImage });
 })();

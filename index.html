@@ -45,6 +45,7 @@
     }
   </style>
 <link rel="stylesheet" href="modern.css">
+<link rel="stylesheet" href="field-export.css">
 </head>
 <body>
   <div id="map" aria-label="南台南田野踏查地圖"></div>
@@ -102,6 +103,9 @@
 <script>window.__fieldRawBeforeInit={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('southTainanFieldSurvey.'))window.__fieldRawBeforeInit[k]=localStorage.getItem(k)}}catch(error){console.warn('無法讀取本機備份',error)}</script>
 <script src="mobile-map.js"></script>
 <script src="word-export.js"></script>
+<script src="field-export.js"></script>
+<script src="generate-docx.js"></script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script async src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
 <script async src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script>
@@ -459,6 +463,45 @@
     }catch(error){wordProgress.textContent=error.message}finally{word.disabled=false}}),wordProgress=make('p',{role:'status'}),wordLink=make('a',{hidden:''},'若未開始下載，點此下載 Word');
     exportDrawer.append(word,wordProgress,wordLink);viewportModern();
 
+
+    // Unified exports: immutable, numbered snapshot; never read the current camera bounds.
+    function exportContext() {
+      const raw=collectReportData();
+      raw.activeAreaId=areaState.activeId;
+      raw.notes.forEach(note=>{note.createdAtMs=note.createdAtMs||cloudMeta.get(note.id)?.createdAtMs||0;note.author=cloudMeta.get(note.id)?.author||''});
+      const data=FieldExport.snapshot(raw),layer=Object.values(base).find(layer=>map.hasLayer(layer))||Object.values(base)[0];
+      return {data,meta:{name:window.document.getElementById('reportProject').value||$('workspaceTitle').textContent,dates:[...new Set(raw.sessions.map(s=>s.date).filter(Boolean))].join('、'),team:authorName},tile:{url:layer._url,options:{...layer.options},attribution:layer.options.attribution}};
+    }
+    let unifiedExportBusy=false;
+    async function withExport(action,progressElement){
+      if(unifiedExportBusy){toast('正在產生匯出文件，請稍候');return}
+      unifiedExportBusy=true;const controls=[$('printNow'),$('generateReport'),word];controls.forEach(b=>b.disabled=true);
+      progressElement.textContent='正在準備匯出…';
+      try{await action()}catch(error){progressElement.textContent='匯出失敗：'+error.message;toast(error.message)}finally{unifiedExportBusy=false;controls.forEach(b=>b.disabled=false)}
+    }
+    word.onclick=()=>withExport(async()=>{
+      const context=exportContext();context.meta.name=data.groups.find(g=>g.id===activeWorkspaceGroup)?.name||'田野手札';
+      const result=await generateDocx(context,{onProgress:p=>wordProgress.textContent=`${p.percent}% ${p.message}`});
+      wordProgress.textContent=result.warnings.length?result.warnings.join('；'):'Word 已生成，已觸發下載。';
+      if(wordLink.href.startsWith('blob:'))URL.revokeObjectURL(wordLink.href);wordLink.href=URL.createObjectURL(result.blob);wordLink.download=result.filename;wordLink.hidden=false;
+    },wordProgress);
+    const mapProgress=make('p',{role:'status'});$('printNow').parentNode.before(mapProgress);
+    async function runPdf(mapOnly){
+      const status=mapOnly?mapProgress:$('reportProgress');
+      return withExport(async()=>{
+        const context=exportContext();
+        context.meta.name=mapOnly?$('printTitle').value: $('reportProject').value;
+        context.meta.orientation=mapOnly?$('printOrientation').value:$('reportOrientation').value;
+        if(!mapOnly)Object.assign(context.meta,{dates:$('reportDates').value,team:$('reportTeam').value,weather:$('reportWeather').value,remarks:$('reportRemarks').value});
+        const image=await captureFieldMap(FieldExport.targetBounds(context.data),{...context,onProgress:message=>status.textContent=message});
+        status.textContent='正在準備列印…';
+        $('printModal').classList.remove('show');$('reportModal').classList.remove('show');
+        await FieldExport.generatePdf(context.data,context.meta,image,{mapOnly});
+      },status);
+    }
+    $('printNow').onclick=()=>runPdf(true);
+    $('reportForm').onsubmit=event=>{event.preventDefault();runPdf(false)};
+    window.generateFieldNotesReport=()=>runPdf(false);
 
     render();renderCloudList();renderHistory();initCloud();
   })();
